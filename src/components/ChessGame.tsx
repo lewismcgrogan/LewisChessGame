@@ -7,13 +7,20 @@ import MoveList from "./MoveList";
 import Toolbar from "./Toolbar";
 import { computeStatus, historyPairs } from "../lib/chess";
 
-// Custom piece images (src/images/*.png)
-import bishop from "../images/bishop.png";
-import king from "../images/king.png";
-import knight from "../images/knight.png";
-import pawn from "../images/pawn.png";
-import queen from "../images/queen.png";
-import rook from "../images/rook.png";
+// Custom piece images (src/images/*.png) — NEW blue/brown set
+import bluebishop from "../images/bluebishop.png";
+import blueking from "../images/blueking.png";
+import blueknight from "../images/blueknight.png";
+import bluepawn from "../images/bluepawn.png";
+import bluequeen from "../images/bluequeen.png";
+import bluerook from "../images/bluerook.png";
+
+import brownbishop from "../images/brownbishop.png";
+import brownking from "../images/brownking.png";
+import brownknight from "../images/brownknight.png";
+import brownpawn from "../images/brownpawn.png";
+import brownqueen from "../images/brownqueen.png";
+import brownrook from "../images/brownrook.png";
 
 type Square =
   `${"a" | "b" | "c" | "d" | "e" | "f" | "g" | "h"}${"1" | "2" | "3" | "4" | "5" | "6" | "7" | "8"}`;
@@ -34,30 +41,11 @@ function resolveImgUrl(mod: unknown): string {
   return "";
 }
 
-function pieceShortName(code: string) {
-  const type = code[1];
-  switch (type) {
-    case "P":
-      return "Pawn";
-    case "N":
-      return "Knight";
-    case "B":
-      return "Bishop";
-    case "R":
-      return "Rook";
-    case "Q":
-      return "Queen";
-    case "K":
-      return "King";
-    default:
-      return "";
-  }
-}
-
 export default function ChessGame() {
   const BOARD_WIDTH = 520;
   const SQUARE_SIZE = BOARD_WIDTH / 8;
 
+  // Keep ONE Chess instance so undo/history works.
   const gameRef = useRef<Chess>(new Chess());
 
   const initialFen = useMemo(() => gameRef.current.fen(), []);
@@ -184,15 +172,11 @@ export default function ChessGame() {
     };
   }
 
-  // Custom pieces
-  const whiteFilter = "brightness(1.2) contrast(1.05)";
-  const blackFilter = "brightness(0.6) contrast(1.15)";
-
+  // Custom pieces (explicit square size div w/ background image)
   const makePiece =
-    (pieceCode: string, srcMod: unknown, filter: string) =>
+    (srcMod: unknown) =>
     () => {
       const url = resolveImgUrl(srcMod);
-      const label = pieceShortName(pieceCode);
 
       return (
         <div
@@ -207,7 +191,6 @@ export default function ChessGame() {
             WebkitUserDrag: "none" as any,
           }}
         >
-          {/* Piece image (back layer) */}
           <div
             style={{
               position: "absolute",
@@ -216,48 +199,28 @@ export default function ChessGame() {
               backgroundRepeat: "no-repeat",
               backgroundPosition: "center",
               backgroundSize: "contain",
-              filter,
               pointerEvents: "none",
             }}
           />
-
-          {/* Name (front layer) */}
-          <div
-            style={{
-              position: "absolute",
-              top: 2,
-              left: 0,
-              width: "100%",
-              textAlign: "center",
-              fontSize: 10,
-              letterSpacing: 1,
-              color: "rgba(255,255,255,0.95)",
-              textShadow: "0 1px 2px rgba(0,0,0,0.9)",
-              pointerEvents: "none",
-              lineHeight: 1,
-              zIndex: 2,
-            }}
-          >
-            {label}
-          </div>
         </div>
       );
     };
 
+  // Map: White = Blue, Black = Brown
   const customPieces = {
-    wP: makePiece("wP", pawn, whiteFilter),
-    wR: makePiece("wR", rook, whiteFilter),
-    wN: makePiece("wN", knight, whiteFilter),
-    wB: makePiece("wB", bishop, whiteFilter),
-    wQ: makePiece("wQ", queen, whiteFilter),
-    wK: makePiece("wK", king, whiteFilter),
+    wP: makePiece(bluepawn),
+    wR: makePiece(bluerook),
+    wN: makePiece(blueknight),
+    wB: makePiece(bluebishop),
+    wQ: makePiece(bluequeen),
+    wK: makePiece(blueking),
 
-    bP: makePiece("bP", pawn, blackFilter),
-    bR: makePiece("bR", rook, blackFilter),
-    bN: makePiece("bN", knight, blackFilter),
-    bB: makePiece("bB", bishop, blackFilter),
-    bQ: makePiece("bQ", queen, blackFilter),
-    bK: makePiece("bK", king, blackFilter),
+    bP: makePiece(brownpawn),
+    bR: makePiece(brownrook),
+    bN: makePiece(brownknight),
+    bB: makePiece(brownbishop),
+    bQ: makePiece(brownqueen),
+    bK: makePiece(brownking),
   };
 
   return (
